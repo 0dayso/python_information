@@ -38,6 +38,6 @@ for article_id, article in articles.items():
     elif imgs:
         articles[article_id]['imgs'] = imgs
 
-articles_json = json.dumps(articles, ensure_ascii=False)
+articles_json = json.dumps(articles)
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 result = requests.post('http://127.0.0.1/index.php', data=articles_json, headers=headers)
