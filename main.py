@@ -24,17 +24,22 @@ news_collection = MongoClient().EZYProperty.news
 #get the article list from webpage
 for title in main_tag.find_all('div', class_='al_title'):
     article_id_raw.update(title.text.encode('utf-8'))
-    article_id = news_collection.insert({"md5":article_id_raw.hexdigest()})
-    articles[article_id]={}
-    articles[article_id]['title'] = title.text
-    articles[article_id]['url'] = "http://www.xkb.com.au" + title.a['href']
-    print(title.text)
+    search_result = news_collection.find_one({"md5":article_id_raw.hexdigest()},{'_id':1})
+    if not search_result:
+        article_id = news_collection.insert({"md5":article_id_raw.hexdigest()})
+        articles[article_id]={}
+        articles[article_id]['title'] = title.text
+        articles[article_id]['url'] = "http://www.xkb.com.au" + title.a['href']
+        print('正在准备: ' + title.text)
+    else:
+        print(title.text + " 已经采集过了，无需再次采集！")
 #get the detail information from inside pages.
 for article_id, article in articles.items():
     article_html = requests.get(article['url'])
     article_soup = BeautifulSoup(article_html.content)
     article_main = article_soup.find('div', id='mid', class_='leftarea arc_body')
     articles[article_id]['content'] = article_main.text
+    articles[article_id]['status'] = 0
     imgs = [x['src'] for x in article_main.findAll('img')]
     if(imgs and domain not in imgs):
         for key, img in enumerate(imgs):
