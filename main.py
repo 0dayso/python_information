@@ -4,6 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 import hashlib
 import json
+import pymongo
+from pymongo import MongoClient
 
 
 html = requests.get('http://xkb.com.au/html/caifu/dichantouzi/')
@@ -15,11 +17,14 @@ domain = 'www.xkb.com.au'
 #Use the hash value of article title as a unique id
 article_id_raw = hashlib.md5()
 
+#Get ready for the database
+news_collection = MongoClient().EZYProperty.news
+
 
 #get the article list from webpage
 for title in main_tag.find_all('div', class_='al_title'):
     article_id_raw.update(title.text.encode('utf-8'))
-    article_id = article_id_raw.hexdigest()
+    article_id = news_collection.insert({"md5":article_id_raw.hexdigest()})
     articles[article_id]={}
     articles[article_id]['title'] = title.text
     articles[article_id]['url'] = "http://www.xkb.com.au" + title.a['href']
@@ -38,6 +43,8 @@ for article_id, article in articles.items():
     elif imgs:
         articles[article_id]['imgs'] = imgs
 
-articles_json = json.dumps(articles)
-headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-result = requests.post('http://127.0.0.1/index.php', data=articles_json, headers=headers)
+for ids, keys in articles.items():
+    result = news_collection.update({'_id':ids},{"$set":keys}, upsert=False)
+    if result:
+        print(str(articles[ids]['title']) + " 入库成功 :)")
+
