@@ -41,15 +41,15 @@ for article_id, article in articles.items():
     articles[article_id]['content'] = article_main.text
     articles[article_id]['status'] = 0
     imgs = [x['src'] for x in article_main.findAll('img')]
-    if(imgs and domain not in imgs):
+    #test if the link is coming with a domain address
+    if any(domain in s for s in imgs):
+        articles[article_id]['imgs'] = imgs
+    elif imgs:
         for key, img in enumerate(imgs):
             imgs[key] = 'http://' + domain + img
             articles[article_id]['imgs'] = imgs
-    elif imgs:
-        articles[article_id]['imgs'] = imgs
-
 for ids, keys in articles.items():
-    result = news_collection.update({'_id':ids},{"$set":keys}, upsert=False)
+    result = news_collection.update({'_id': ids}, {"$set":keys}, upsert=False)
     if result:
-        print(str(articles[ids]['title']) + " 入库成功 :)")
+        print("入库成功: " + str(articles[ids]['title']))
 
