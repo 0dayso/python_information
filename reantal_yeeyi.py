@@ -1,6 +1,8 @@
 __author__ = 'yuerzx'
 from bs4 import BeautifulSoup
 import requests
+import time
+import random
 import pre_process
 
 #Basic setting area
@@ -22,6 +24,7 @@ for md5, link in available_links.items():
     rental_id = pre_process.rental_collection.insert({"md5": md5})
     rental[rental_id] = {}
     rental[rental_id]["url"] = link
+    time.sleep(random.randint(1,7))
     html = requests.get(link, headers=header)
     index = BeautifulSoup(html.content,from_encoding='GBK')
     #Get the publishing data
