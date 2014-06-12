@@ -12,11 +12,15 @@ home_url = "http://www.yeeyi.com/bbs/house.php?mod=list&filter=all&city=30&sorti
 #hide the system as a chrome
 header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5"}
 #Get the first few pages of yeeyi
-for x in range(1, 2):
+print('Start to collect')
+available_links={}
+for x in range(1,5):
     home_url = home_url + str(x)
+    print('Get page' + str(x))
+    print(home_url)
     home_html = requests.get(home_url, headers = header)
     home_index = BeautifulSoup(home_html.content, from_encoding="gbk")
-    available_links = pre_process.front_page_links(home_index)
+    available_links = available_links.update(pre_process.front_page_links(home_index))
 rental = {}
 counter = 0
 for md5, link in available_links.items():
@@ -53,3 +57,5 @@ while rental:
     rental = {}
 
 print(rental)
+
+pre_process.rental_client.close()
