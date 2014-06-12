@@ -6,7 +6,8 @@ import hashlib
 from pymongo import MongoClient
 
 #Get ready for the database
-rental_collection = MongoClient().EZYProperty.rental
+rental_client = MongoClient()
+rental_collection = rental_client.EZYProperty.rental
 domain = "yeeyi.com/bbs/"
 
 def yeeyi_title_process(item):
@@ -17,7 +18,7 @@ def yeeyi_title_process(item):
         if "来源" in item:
             return "Property Source"
         elif "租金" in item:
-            return "Rent"
+            return "Property Rent"
         elif "户型" in item:
             return "Property Rooms"
     elif "详细" in item:
@@ -79,27 +80,23 @@ def information_pickup(page_content):
     for p in page_content.find_all('p'):
         if p.span:
             item_title = str(yeeyi_title_process(p.span.text))
-            if "Unknown!" in item_title:
-                item["human"] = 1
             p.span.extract()
             item_content = re.sub('\\xa0', '', p.text)
             if item_title == "Property Rooms":
                 item_content = get_rooms(item_content)
             elif item_title == "Phone": #vaild phone number
-                item_content.replace(" ", "")
                 phone_vaild = re.search("\d{9,11}", item_content)
                 if phone_vaild:
                     item_content = phone_vaild.group(0)
                 else:
-                    item_content = "Unknown! " + item_content
+                    item_content = "Unknown!" + item_content
             #skip content
-            elif item_title == "Details" or item_title == "Address" or item_title == "Contacts":
+            elif item_title == "Details":
                 item_content = item_content
-
+            elif item_title == "Address":
+                item_content = item_content
             else:
                 item_content = yeeyi_content_process(item_content)
-            if "Unknown!" in item_content:
-                item["human"] = 1
             item[item_title] = item_content
     #find out all the images
     imgs =[img['src'] for img in page_content.find_all('img')]
@@ -137,7 +134,7 @@ def get_rooms(item):
         balcony = int(list_rooms[(position[0]-1)])
     else:
         balcony = 0
-    return {"Bedroom":bedroom,"Living Room": living_room, "Bath Room": bath_room, "Balcony":balcony}
+    return {"bedroom":bedroom,"living Room": living_room, "Bath Room": bath_room, "Balcony":balcony}
 
 def front_page_links(home_index):
     links= {}
@@ -164,5 +161,5 @@ def get_publish_time(index):
         time_stamp = time.strptime(time_stamp_pre.group(0),"%Y-%m-%d %H:%M")
         time_pub = time.strftime("%d-%m-%Y %H:%M", time_stamp)
     else:
-        time_pub = "Unknown! " + (index.find('div', class_="pti")).em.text
+        time_pub = "Unknown!" + (index.find('div', class_="pti")).em.text
     return time_pub
