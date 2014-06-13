@@ -96,7 +96,7 @@ def information_pickup(page_content):
             elif item_title == "Address":
                 item_content = item_content
             elif item_title == "Property Rent":
-                item_content.replace('刀/周')
+                item_content.replace('刀/周','')
             else:
                 item_content = yeeyi_content_process(item_content)
             item[item_title] = item_content
@@ -160,9 +160,9 @@ def get_publish_time(index):
     time_stamp_pre_soup = index.find('div', class_="pti")
     if time_stamp_pre_soup:
         time_stamp_pre = re.search("\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}",time_stamp_pre_soup.em.text)
-    if time_stamp_pre:
-        time_stamp = time.strptime(time_stamp_pre.group(0),"%Y-%m-%d %H:%M")
-        time_pub = time.strftime("%d-%m-%Y %H:%M", time_stamp)
+        if time_stamp_pre:
+            time_stamp = time.strptime(time_stamp_pre.group(0),"%Y-%m-%d %H:%M")
+            time_pub = time.strftime("%d-%m-%Y %H:%M", time_stamp)
     else:
         time_pub = "Unknown!" + (index.find('div', class_="pti")).em.text
     return time_pub
