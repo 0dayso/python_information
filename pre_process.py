@@ -95,6 +95,8 @@ def information_pickup(page_content):
                 item_content = item_content
             elif item_title == "Address":
                 item_content = item_content
+            elif item_title == "Property Rent":
+                item_content.replace('刀/周')
             else:
                 item_content = yeeyi_content_process(item_content)
             item[item_title] = item_content

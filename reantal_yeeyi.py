@@ -14,17 +14,19 @@ header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (
 #Get the first few pages of yeeyi
 print("Program is ready to go :)")
 available_links = {}
-for x in range(1, 5):
+for x in range(1, 6):
     home_url_tmp = home_url + str(x)
     print("Get page " + str(x) + " Ready!")
     home_html = requests.get(home_url_tmp, headers = header)
     print(home_url_tmp)
     home_index = BeautifulSoup(home_html.content, from_encoding="gbk")
     available_links.update(pre_process.front_page_links(home_index))
-    print(available_links);
+    print(available_links)
 rental = {}
 counter = 0
+total = 0
 for md5, link in available_links.items():
+    total += 1
     counter += 1
     rental_id = pre_process.rental_collection.insert({"md5": md5})
     rental[rental_id] = {}
@@ -52,9 +54,10 @@ for md5, link in available_links.items():
 
 while rental:
     for ids, keys in rental.items():
-            result = pre_process.rental_collection.update({'_id': ids}, {"$set":keys}, upsert=False)
-            if result:
-                print("入库成功: " + str(rental[ids]['title']))
+        total += 1
+        result = pre_process.rental_collection.update({'_id': ids}, {"$set":keys}, upsert=False)
+        if result:
+            print("入库成功: " + str(rental[ids]['title']))
     rental = {}
 
 print(rental)
