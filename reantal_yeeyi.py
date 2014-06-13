@@ -1,9 +1,9 @@
 __author__ = 'yuerzx'
 from bs4 import BeautifulSoup
 import requests
-import time
-import random
 import pre_process
+import random
+import time
 
 #Basic setting area
 #start page
@@ -12,15 +12,16 @@ home_url = "http://www.yeeyi.com/bbs/house.php?mod=list&filter=all&city=30&sorti
 #hide the system as a chrome
 header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5"}
 #Get the first few pages of yeeyi
-print('Start to collect')
-available_links={}
-for x in range(1,5):
-    home_url = home_url + str(x)
-    print('Get page' + str(x))
-    print(home_url)
-    home_html = requests.get(home_url, headers = header)
+print("Program is ready to go :)")
+available_links = {}
+for x in range(1, 5):
+    home_url_tmp = home_url + str(x)
+    print("Get page " + str(x) + " Ready!")
+    home_html = requests.get(home_url_tmp, headers = header)
+    print(home_url_tmp)
     home_index = BeautifulSoup(home_html.content, from_encoding="gbk")
-    available_links = available_links.update(pre_process.front_page_links(home_index))
+    available_links.update(pre_process.front_page_links(home_index))
+    print(available_links);
 rental = {}
 counter = 0
 for md5, link in available_links.items():
@@ -28,7 +29,7 @@ for md5, link in available_links.items():
     rental_id = pre_process.rental_collection.insert({"md5": md5})
     rental[rental_id] = {}
     rental[rental_id]["url"] = link
-    time.sleep(random.randint(1,7))
+    time.sleep(random.randrange(1,3))
     html = requests.get(link, headers=header)
     index = BeautifulSoup(html.content,from_encoding='GBK')
     #Get the publishing data
@@ -57,5 +58,4 @@ while rental:
     rental = {}
 
 print(rental)
-
 pre_process.rental_client.close()
