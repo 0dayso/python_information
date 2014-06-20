@@ -17,7 +17,7 @@ article_id_raw = hashlib.md5()
 news_collection = config.data_base.news
 print("Start to collect articles from XKB.com.")
 
-for x in range(1, 10):
+for x in range(1, 13):
     page_link = link + "list_270_" + str(x) + ".html"
     html = requests.get(page_link, headers = config.header)
     soup = BeautifulSoup(html.content)
@@ -62,4 +62,5 @@ for ids, keys in articles.items():
         print("入库成功: " + str(articles[ids]['title']))
 
 print("We have got %d items in total" % counter)
+config.data_client.logout()
 config.data_client.close()
