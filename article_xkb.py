@@ -62,5 +62,5 @@ for ids, keys in articles.items():
         print("入库成功: " + str(articles[ids]['title']))
 
 print("We have got %d items in total" % counter)
-config.data_client.logout()
+config.data_base.logout()
 config.data_client.close()
