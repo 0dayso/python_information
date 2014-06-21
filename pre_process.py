@@ -165,5 +165,5 @@ def get_publish_time(index):
             time_pub = time.strftime("%d-%m-%Y %H:%M", time_stamp)
             return time_pub
     else:
-        time_pub = "Unknown!" + (index.find('div', class_="pti")).em.text
+        time_pub = "Unknown!"
         return time_pub
