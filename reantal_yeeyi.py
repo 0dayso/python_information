@@ -15,7 +15,7 @@ home_url = "http://www.yeeyi.com/bbs/house.php?mod=list&filter=all&city=30&sorti
 import config
 print("Program is ready to go :)")
 available_links = {}
-for x in range(1, 10):
+for x in range(1, 2):
     home_url_tmp = home_url + str(x)
     print("Get page " + str(x) + " Ready!")
     home_html = requests.get(home_url_tmp, headers = config.header)
@@ -33,7 +33,7 @@ for md5, link in available_links.items():
     rental[rental_id] = {}
     rental[rental_id]["url"] = link
     time.sleep(random.randrange(1,3))
-    html = requests.get(link, headers=header)
+    html = requests.get(link, headers=config.header)
     index = BeautifulSoup(html.content,from_encoding='GBK')
     #Get the publishing data
     rental[rental_id]["publish_time"] = pre_process.get_publish_time(index)
@@ -62,5 +62,6 @@ while rental:
     rental = {}
 
 
-print("Total valid record is" + total)
-pre_process.rental_client.close()
+print("Total valid record is %d"%total)
+config.data_base.logout()
+config.data_client.close()

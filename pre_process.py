@@ -4,10 +4,10 @@ import re
 import time
 import hashlib
 from pymongo import MongoClient
+import config
 
 #Get ready for the database
-rental_client = MongoClient()
-rental_collection = rental_client.EZYProperty.rental
+rental_collection = config.data_base.rental
 domain = "yeeyi.com/bbs/"
 
 def yeeyi_title_process(item):
@@ -163,6 +163,7 @@ def get_publish_time(index):
         if time_stamp_pre:
             time_stamp = time.strptime(time_stamp_pre.group(0),"%Y-%m-%d %H:%M")
             time_pub = time.strftime("%d-%m-%Y %H:%M", time_stamp)
+            return time_pub
     else:
         time_pub = "Unknown!" + (index.find('div', class_="pti")).em.text
-    return time_pub
+        return time_pub
