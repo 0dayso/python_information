@@ -30,7 +30,7 @@ for x in range(1, 13):
         article_id_raw.update(title.text.encode('utf-8'))
         search_result = news_collection.find_one({"md5":article_id_raw.hexdigest()},{'_id':1})
         if not search_result:
-            pub_time = soup.find("div", class_= "al_pubdate").text
+            pub_time = blocks.find("div", class_= "al_pubdate").text
             pub_time.replace("\xa0",' ')
             article_id = news_collection.insert({"md5":article_id_raw.hexdigest()})
             articles[article_id]={}
@@ -40,10 +40,11 @@ for x in range(1, 13):
             print('正在准备: ' + title.text)
         else:
             print(title.text + " 已经采集过了，无需再次采集！")
-
+total_items = len(articles)
 #get the detail information from inside pages.
 for article_id, article in articles.items():
     counter += 1
+    print('Start to get: %d/%d %s'%(counter,total_items,article['title']))
     time.sleep(random.randint(1, 3))
     article_html = requests.get(article['url'])
     article_soup = BeautifulSoup(article_html.content)
