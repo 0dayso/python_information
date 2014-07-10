@@ -27,7 +27,7 @@ for x in range(1, 13):
     #get the article list from web page
     for blocks in main_tag.find_all('div', class_='al'):
         title = blocks.find('div', class_='al_title')
-        article_id_raw.update(title.a['href'])
+        article_id_raw.update(title.a['href'].encode('utf-8'))
         search_result = news_collection.find_one({"md5":article_id_raw.hexdigest()},{'_id':1})
         if not search_result:
             pub_time = blocks.find("div", class_= "al_pubdate").text
