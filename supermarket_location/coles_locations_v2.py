@@ -18,23 +18,28 @@ counter = 0
 
 def geo_details(link):
     details_link = 'http://www.coles.com.au' + link
-    detail_page = requests.get(details_link, headers=header)
-    if detail_page.status_code == 200:
-        detail_dom = BeautifulSoup(detail_page.content)
-        script_section = detail_dom.find('section', class_="row store-detail")
-        script = script_section.find('script', text=True)
-        jsonValue = '[%s]' % (script.text.split('[', 1)[1].rsplit(']', 1)[0],)
-        value = json.loads(jsonValue)
-        store_number = store_info_select(link)
-        store_value = {}
-        for x in value:
-            if x['Id'] == store_number:
-                store_value = x
-    else:
-        print('Error in system')
-        location['Latitude'] = 'Error'
-        location['Longitude'] = 'Error'
-        location['Id'] = store_info_select(link)
+    for i in range(0,2):
+        detail_page = requests.get(details_link, headers=header)
+        Error = 1
+        if detail_page.status_code == 200:
+            Error = 0
+            detail_dom = BeautifulSoup(detail_page.content)
+            script_section = detail_dom.find('section', class_="row store-detail")
+            script = script_section.find('script', text=True)
+            jsonValue = '[%s]' % (script.text.split('[', 1)[1].rsplit(']', 1)[0],)
+            value = json.loads(jsonValue)
+            store_number = store_info_select(link)
+            store_value = {}
+            for x in value:
+                if x['Id'] == store_number:
+                    store_value = x
+        else:
+            print('Error in system')
+            location['Latitude'] = 'Error'
+            location['Longitude'] = 'Error'
+            location['Id'] = store_info_select(link)
+        if Error == 0:
+            break
     return store_value
 
 def store_info_select(link):
@@ -43,9 +48,9 @@ def store_info_select(link):
     return item_number
 
 #close up the documents for csv
-f = open('D:\playground\coles.csv', 'w', newline='')
+f = open('coles.csv', 'w', newline='')
 writer = csv.writer(f, delimiter=',',quoting=csv.QUOTE_NONE, quotechar='')
-writer.writerow(['S_Id','S_Name', 'Suburb','State', 'PCode', 'Phone', 'lat', 'lng', 'Full_Address'])
+writer.writerow(['S_Id','S_Name', 'Suburb','State', 'PCode', 'Phone', 'lat', 'lng', 'Full_Address', 'link'])
 for rows in states.find_all('div', class_='row'):
     bs = rows.find('a')
     break_point = False
@@ -68,7 +73,7 @@ for rows in states.find_all('div', class_='row'):
             lng = location['Longitude']
             store_id = location['Id']
         print('We are processing ' + store_name)
-        writer.writerow([store_id, store_name, locality, state, post_code, phone, lat, lng, pre_full_address])
+        writer.writerow([store_id, store_name, locality, state, post_code, phone, lat, lng, pre_full_address, details_link_pre])
         #google is only allowed for 10 requests per second
         time.sleep(0.3)
     if break_point == True:
