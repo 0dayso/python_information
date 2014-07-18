@@ -6,6 +6,8 @@ import config
 import requests
 from bs4 import BeautifulSoup
 import csv
+import google_maps_api
+import time
 
 html = requests.get('http://www.coles.com.au/store-locator', headers= config.header)
 dom = BeautifulSoup(html.content)
@@ -21,42 +23,51 @@ def suburb_database_check(post_code):
 
 #close up the documents for csv
 f = open('D:\playground\coles.csv', 'w', newline='')
-writer = csv.writer(f, delimiter=',',quoting=csv.QUOTE_NONE, quotechar='|')
-writer.writerow(['Store Name','Address', 'Suburb','State', 'Post Code', 'Phone'])
+writer = csv.writer(f, delimiter=',',quoting=csv.QUOTE_NONE, quotechar='')
+#writer.writerow(['Store Name','S_No','S_name', 'Suburb','State', 'PCode', 'Phone', 'lat', 'lng', 'Full_Address'])
 for rows in states.find_all('div', class_='row'):
     bs = rows.find('a')
+    break_point = False
     if bs != None:
         counter += 1
-        title = rows.a.div.h4.text
+        store_name = rows.a.div.h4.text
         pre_full_address = rows.find('span', class_='address').text
-        full_address_list = pre_full_address.split(' ')
-        post_code = full_address_list[-1]
-        full_address_list.remove(post_code)
-        land_info_results = suburb_database_check(post_code)
-        error = 0
-        suburb_name = ''
-        state = ''
-        for result in land_info_results:
-            state = result['State']
-            if full_address_list[-1] == result['Locality'].title():
-                suburb_name = full_address_list[-1]
-                del full_address_list[-1]
-            else:
-                if len(full_address_list) <= 2:
-                    break
-                else:
-                    long_name = full_address_list[-1] + full_address_list[-2]
-                    if long_name == result['Locality'].title():
-                        suburb_name = long_name
-                        del full_address_list[-1]
-                        del full_address_list[-1]
-                    else:
-                        suburb_name = 'Unknown'
-        full_address = (" ").join(full_address_list)
+        location = google_maps_api.google_decode(pre_full_address)
+        street_number       = ''
+        street_name         = ''
+        locality            = ''
+        state               = ''
+        post_code           = ''
+        if location['status'] != 'OK':
+            print('Something wrong with google maps and we are going to stop now!!')
+            print(location)
+            break_point = True
+            break
+        else:
+            lat                 = location['results'][0]['geometry']['location']['lat']
+            lng                 = location['results'][0]['geometry']['location']['lng']
+            location_components = location['results'][0]['address_components']
+            for items in location_components:
+                for type in items['types']:
+                    if type == 'street_number':
+                        street_number = items['short_name']
+                    elif type == 'route':
+                        street_name = items['short_name']
+                    elif type == 'locality':
+                        locality = items['short_name']
+                    elif type == 'administrative_area_level_1':
+                        state = items['short_name']
+                    elif type == 'postal_code':
+                        post_code = items['short_name']
+                    elif type == 'establishment':
+                        street_name = items['short_name']
         phone = rows.find('span', class_='phone').text
-        print('We are processing ' + title)
-        writer.writerow([title, full_address, suburb_name, state, post_code, phone])
-
+        print('We are processing ' + store_name)
+        writer.writerow([store_name, street_number,street_name, locality, state, post_code, phone, lat, lng, pre_full_address])
+        #google is only allowed for 10 requests per second
+        time.sleep(1)
+    if counter == 10 or break_point == True:
+        break
 f.close()
 print("Total valid record is %d"%counter)
 config.data_base.logout()
