@@ -23,3 +23,4 @@ for x in a_list.findAll("li"):
 
 print("We got %d in total" % s_counter)
 
+print()
