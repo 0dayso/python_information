@@ -7,7 +7,7 @@ import csv
 import time
 
 header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5"}
-filename = "buses" # trams or trains
+filename = "bus" # trams or trains
 f = open(filename +'.csv', 'r', newline='')
 fw = open(filename+ '_step1.csv', 'w', newline ='')
 s_counter = 0 
@@ -26,7 +26,7 @@ for row in reader:
         try:
             html = requests.get(link, headers=header, timeout = 3)
         except:
-            writer.writerow(['Error', suburb, 'Error'])
+            writer.writerow(['Error', suburb, link])
             e_counter += 1
             pass
         pass
@@ -44,8 +44,7 @@ for row in reader:
                 writer.writerow([details_name, suburb, details_in_link])
                 print("The number %d"%num)
     else:
-        e_counter += 1
-        writer.writerow(['Error', suburb, 'Error'])
+        print('Unable to locate files!')
 f.close()
 fw.close()
 print("We got %d in total with %d errors"%(s_counter,e_counter))
