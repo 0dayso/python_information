@@ -44,29 +44,32 @@ for links in alpha_list.find_all("a"):
     list_a.append("http://www.realestateview.com.au"+links['href'])
 
 #go through all the alpha lists
-for urls in list_a:
-    html_1 = requests.get(urls, headers=header)
-    dom = BeautifulSoup(html_1.content)
-    sub_list = {}
-    time.sleep(1.5)
-    list_suburb = dom.find("div", class_="pd-content-inner")
-    for items in list_suburb.find_all("a"):
-        sub_list[items.text] = "http://www.realestateview.com.au"+items['href']
-    for detail_sub in sub_list.items():
-        print("Process " + detail_sub[0])
-        sub={}
-        time.sleep(random.randint(1,5))
-        details = get_detail_page(detail_sub[1])
-        sub[detail_sub[0]] = details
-        results = super_c.insert(sub)
-        if results:
-            s_counter += 1
-            print("Done with %s"%detail_sub[0])
-        else:
-            e_counter += 1
-            print("Error")
-            print(results)
-    break
+try:
+    for urls in list_a:
+        html_1 = requests.get(urls, headers=header)
+        dom = BeautifulSoup(html_1.content)
+        sub_list = {}
+        time.sleep(1.5)
+        list_suburb = dom.find("div", class_="pd-content-inner")
+        for items in list_suburb.find_all("a"):
+            sub_list[items.text] = "http://www.realestateview.com.au" + items['href']
+        for detail_sub in sub_list.items():
+            print("Process " + detail_sub[0])
 
+            time.sleep(random.randint(1,5))
+            details = get_detail_page(detail_sub[1])
+            details['suburb'] = detail_sub[0]
+            results = super_c.insert(details)
+            if results:
+                s_counter += 1
+                print("Done with %s"%detail_sub[0])
+            else:
+                e_counter += 1
+                print("Error")
+                print(results)
+except:
+    e_counter += 1
+    print('Something wrong is happening :( Keep going')
+    pass
 print("All done with %d in total with %d errors"%(s_counter+e_counter, e_counter))
 data_client.close()
