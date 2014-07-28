@@ -24,6 +24,7 @@ def get_detail_page(link):
             details = infoblock.find("div", class_="pd-content-medium")
             for x in details.find_all('p'):
                 title = x.b.text.replace(".", "")
+
                 if len(title) != 0:
                     x.b.extract()
                 clean_text = x.text.strip()
