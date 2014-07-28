@@ -58,7 +58,7 @@ try:
 
             time.sleep(random.randint(1,5))
             details = get_detail_page(detail_sub[1])
-            details['suburb'] = detail_sub[0]
+            details['Suburb'] = detail_sub[0]
             results = super_c.insert(details)
             if results:
                 s_counter += 1
