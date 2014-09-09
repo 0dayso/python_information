@@ -19,7 +19,7 @@ article_id_raw = hashlib.md5()
 news_collection = config.data_base.news
 print("Start to collect articles from XKB.com.")
 
-for x in range(1, 13):
+for x in range(1, 2):
     page_link = link + "list_270_" + str(x) + ".html"
     html = requests.get(page_link, headers = config.header)
     soup = BeautifulSoup(html.content)
@@ -67,3 +67,6 @@ for ids, keys in articles.items():
 print("We have got %d items in total" % counter)
 config.data_base.logout()
 config.data_client.close()
+
+print('Now We are doing the injection')
+news = requests.get('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/xkb.php?act=kslr')

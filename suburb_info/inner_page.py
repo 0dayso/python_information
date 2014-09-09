@@ -10,7 +10,7 @@ data_client = MongoClient()
 data_base = data_client.Locations
 #add authenticate for the MongoDB
 #data_base.authenticate('EZYProperty', '8jshf7asd')
-super_c = data_base.suburb_info
+super_c = data_base.Suburb_info
 
 header = {
 "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5"}
