@@ -83,6 +83,7 @@ for article_id, article in articles.items():
             if result:
                 print("入库成功: " + str(articles[ids]['title']))
         block_set={}
+        inner_counter = 0
 for ids, keys in block_set.items():
     result = news_collection.update({'_id': ids}, {"$set":keys}, upsert=False)
     if result:
@@ -129,4 +130,4 @@ config.data_base.logout()
 config.data_client.close()
 
 print('Now We are doing the injection')
-#news = requests.get('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/ausproperty.php?act=kslr')
+news = requests.get('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/ausproperty.php?act=kslr')
