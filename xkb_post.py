@@ -6,11 +6,13 @@ import hashlib
 import time
 import random
 import json
+import config
 
 
 articles = {}
 domain = 'www.xkb.com.au'
 link = 'http://xkb.com.au/html/caifu/dichantouzi/'
+inject_url = 'http://127.0.0.1/maifang/wp-content/themes/Focus/wordpress_injection/data-inject.php'
 counter = 0
 header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5"}
 
@@ -27,16 +29,20 @@ for x in range(1, 2):
     #get the article list from web page
     for blocks in main_tag.find_all('div', class_='al'):
         title = blocks.find('div', class_='al_title')
-        pub_time = blocks.find("div", class_= "al_pubdate").text
-        pub_time.replace("\xa0",' ')
-        article_id_raw.update(title.a['href'].encode('utf-8'))
-        article_id = article_id_raw.hexdigest()
-        articles[article_id]={}
-        articles[article_id]['pub_time'] = pub_time
-        articles[article_id]['title'] = title.text
-        articles[article_id]['url'] = "http://www.xkb.com.au" + title.a['href']
-        articles[article_id]['source'] = 'xkb'
-        print('正在准备: ' + title.text)
+        title_txt = title.text
+        if config.check_exist(title_txt):
+            pub_time = blocks.find("div", class_= "al_pubdate").text
+            pub_time.replace("\xa0",' ')
+            article_id_raw.update(title.a['href'].encode('utf-8'))
+            article_id = article_id_raw.hexdigest()
+            articles[article_id]={}
+            articles[article_id]['pub_time'] = pub_time
+            articles[article_id]['title'] = title.text
+            articles[article_id]['url'] = "http://www.xkb.com.au" + title.a['href']
+            articles[article_id]['source'] = 'xkb'
+            print('正在准备: ' + title_txt)
+        else:
+            print('已经采集: ' + title_txt)
 
 total_items = len(articles)
 
@@ -60,7 +66,7 @@ for article_id, article in articles.items():
             articles[article_id]['imgs'] = imgs
 for ids, keys in articles.items():
     try:
-        result = requests.post('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/data-inject.php', data = json.dumps(keys))
+        result = requests.post(inject_url, data = json.dumps(keys))
         status_code = json.loads(result.text)
         if status_code['Status'] == 'Success':
             print("Successfully inject %s" % keys['title'])
@@ -68,6 +74,6 @@ for ids, keys in articles.items():
             print(status_code)
             print("Error")
     except:
-        pass
+        print("Error")
 
 print("We have got %d items in total" % counter)
