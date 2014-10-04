@@ -15,7 +15,7 @@ header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (
 def check_exist(title):
     try:
         keys={"title": title, "pass":"human" }
-        result = requests.post('http://127.0.0.1/maifang/wp-content/themes/Focus/wordpress_injection/check.php', data = json.dumps(keys))
+        result = requests.post('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/check.php', data = json.dumps(keys))
         status_code = json.loads(result.text)
         if status_code['Status'] == 'OK':
             return True

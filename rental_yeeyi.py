@@ -18,13 +18,15 @@ import config
 print("Program is ready to go :)")
 available_links = {}
 for x in range(1, 2):
-    home_url_tmp = home_url + str(x)
-    print("Get page " + str(x) + " Ready!")
-    home_html = requests.get(home_url_tmp, headers = config.header)
-    print(home_url_tmp)
-    home_index = BeautifulSoup(home_html.content, from_encoding="gbk")
-    available_links.update(pre_process.front_page_links(home_index))
-
+    try:
+        home_url_tmp = home_url + str(x)
+        print("Get page " + str(x) + " Ready!")
+        home_html = requests.get(home_url_tmp, headers = config.header)
+        print(home_url_tmp)
+        home_index = BeautifulSoup(home_html.content, from_encoding="gbk")
+        available_links.update(pre_process.front_page_links(home_index))
+    except:
+        pass
 rental = {}
 counter = 0
 total = 0
@@ -34,17 +36,21 @@ for md5, link in available_links.items():
     rental_id = pre_process.rental_collection.insert({"md5": md5})
     rental[rental_id] = {}
     rental[rental_id]["url"] = link
-    time.sleep(random.randrange(1,3))
-    html = requests.get(link, headers=config.header)
-    index = BeautifulSoup(html.content,from_encoding='GBK')
-    #Get the publishing data
-    rental[rental_id]["publish_time"] = pre_process.get_publish_time(index)
-    #Get the title
-    rental[rental_id]["title"] = pre_process.get_page_title(index)
-    #Prepare all the documents content
-    page_content = index.find('td', class_='t_f')
-    pre_process.cleanup_marks(page_content)
-    items = pre_process.information_pickup(page_content)
+    time.sleep(random.randrange(1,5))
+    try:
+        html = requests.get(link, headers=config.header)
+        index = BeautifulSoup(html.content,from_encoding='GBK')
+        #Get the publishing data
+        rental[rental_id]["publish_time"] = pre_process.get_publish_time(index)
+        #Get the title
+        rental[rental_id]["title"] = pre_process.get_page_title(index)
+        #Prepare all the documents content
+        page_content = index.find('td', class_='t_f')
+        pre_process.cleanup_marks(page_content)
+        items = pre_process.information_pickup(page_content)
+    except:
+        print('Unable to get the article, network error maybe!')
+        pass
     for k, v in items.items():
         rental[rental_id][k] = v
     if counter == 5:
@@ -63,7 +69,6 @@ while rental:
             print("入库成功: " + str(rental[ids]['title']))
     rental = {}
 
-
+pre_process.rental_collection.remove({'Details':{"$exists":0}})
 print("Total valid record is %d"%total)
 config.data_base.logout()
-config.data_client.close()

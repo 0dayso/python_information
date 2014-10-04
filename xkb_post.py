@@ -12,7 +12,7 @@ import config
 articles = {}
 domain = 'www.xkb.com.au'
 link = 'http://xkb.com.au/html/caifu/dichantouzi/'
-inject_url = 'http://127.0.0.1/maifang/wp-content/themes/Focus/wordpress_injection/data-inject.php'
+inject_url = 'http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/data-inject.php'
 counter = 0
 header = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.52 Safari/536.5"}
 
@@ -21,7 +21,7 @@ article_id_raw = hashlib.md5()
 #Get ready for the database
 print("Start to collect articles from XKB.com.")
 
-for x in range(1, 2):
+for x in range(1, 5):
     page_link = link + "list_270_" + str(x) + ".html"
     html = requests.get(page_link, headers = header)
     soup = BeautifulSoup(html.content)

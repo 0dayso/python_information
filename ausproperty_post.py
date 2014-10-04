@@ -21,7 +21,7 @@ inner_counter = 0
 article_id_raw = hashlib.md5()
 #Get ready for the database
 print("Start to collect articles from AusProperty.cn .")
-for x in range(1, 3):
+for x in range(1, 5):
     page_link = link + "list_117_" + str(x) + ".html"
     html = requests.get(page_link, headers = config.header)
     soup = BeautifulSoup(html.content)
@@ -80,7 +80,7 @@ for article_id, article in articles.items():
     if inner_counter>= 5:
         for ids, keys in block_set.items():
             try:
-                result = requests.post('http://127.0.0.1/maifang/wp-content/themes/Focus/wordpress_injection/data-inject.php', data = json.dumps(keys))
+                result = requests.post('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/data-inject.php', data = json.dumps(keys))
                 status_code = json.loads(result.text)
                 if status_code['Status'] == 'Success':
                     print("Successfully inject %s" % keys['title'])
