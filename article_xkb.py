@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 
 __author__ = 'yuerzx'
 
@@ -30,7 +30,7 @@ for x in range(1, 2):
         article_id_raw.update(title.a['href'].encode('utf-8'))
         search_result = news_collection.find_one({"md5":article_id_raw.hexdigest()},{'_id':1})
         if not search_result:
-            pub_time = blocks.find("div", class_= "al_pubdate").text
+            pub_time = blocks.find("div", class_= "al_pubdate").text#!/usr/bin/env python3
             pub_time.replace("\xa0",' ')
             article_id = news_collection.insert({"md5":article_id_raw.hexdigest()})
             articles[article_id]={}
