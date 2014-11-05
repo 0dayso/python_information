@@ -14,6 +14,7 @@ import json
 articles = {}
 domain = 'www.ausproperty.cn'
 link = 'http://www.ausproperty.cn/instruction/strategy/'
+inject_port = 'http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/data-inject.php'
 counter = 0
 error = 0
 inner_counter = 0
@@ -80,7 +81,7 @@ for article_id, article in articles.items():
     if inner_counter>= 5:
         for ids, keys in block_set.items():
             try:
-                result = requests.post('http://www.maifang.com.au/wp-content/themes/Focus/wordpress_injection/data-inject.php', data = json.dumps(keys))
+                result = requests.post(inject_port, data = json.dumps(keys))
                 status_code = json.loads(result.text)
                 if status_code['Status'] == 'Success':
                     print("Successfully inject %s" % keys['title'])
@@ -94,7 +95,7 @@ for article_id, article in articles.items():
         print("Here here and here!!!")
 for ids, keys in block_set.items():
     try:
-        result = requests.post('http://127.0.0.1/wp-content/themes/Focus/wordpress_injection/data-inject.php', data = json.dumps(keys))
+        result = requests.post(inject_port, data = json.dumps(keys))
         status_code = json.loads(result.text)
         if status_code['Status'] == 'Success':
             print("Successfully inject %s" % keys['title'])
